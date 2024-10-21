@@ -40,8 +40,8 @@ En esta guía, configuraré una Virtual Private Cloud (VPC) para implementar un 
 
 Como se necesita que la VPC tenga una conexión a Internet, se debe configurar un **Internet Gateway**.
 
-    - Cuando se crea el Internet Gateway, se conecta a la VPC
-    - Creo una tabla de enrutamiento (Route Table)
-    - En la Route Table asocio las dos **subredes públicas** y creo una ruta para permitir la conexión a Internet a través del **Internet Gateway**
+   - Cuando se crea el Internet Gateway, se conecta a la VPC
+   - Creo una tabla de enrutamiento (Route Table)
+   - En la Route Table asocio las dos **subredes públicas** y creo una ruta para permitir la conexión a Internet a través del **Internet Gateway**
 
 <hr>
