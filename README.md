@@ -124,55 +124,56 @@ Como se necesita que la VPC tenga una conexión a Internet, se debe configurar u
 
     - Para ejecutar el servidor web, ejecuto el siguiente comando en el directorio donde se encuentra app.py. Debe asegurarse de que el grupo de seguridad tenga habilitado el puerto apropiado.
 
-        python3 -m virtualenv venv
-        source venv/bin/activate
-        python app.py
+                python3 -m virtualenv venv
+                source venv/bin/activate
+                python app.py
 
     - Hasta el momento no se ha configurado la base de datos. Voy al directorio llamado databases y ejecuto los siguientes comandos
 
-        sudo chmod +x set-root-user.sh createdb.sh
-        sudo ./set-root-user.sh
-        sudo ./createdb.sh
+                sudo chmod +x set-root-user.sh createdb.sh
+                sudo ./set-root-user.sh
+                sudo ./createdb.sh
 
     - Puede verificar si la base de datos fue creada ejecutando el siguiente comando:
 
-        sudo mysql
-        show databases;
-        use books_db;
-        show tables;
-        SELECT * FROM Books;
+                sudo mysql
+                show databases;
+                use books_db;
+                show tables;
+                SELECT * FROM Books;
 
     - La base de datos no está configurada en AWS RDS sino en AWS EC2. Por lo tanto, más adelante, configuraré AWS RDS.
 
-    - Desde la terminal de instancia, creo el siguiente archivo
+    - Desde la terminal de la instancia, creo el siguiente archivo para que el servidor web se ejecute en segundo plano. 
 
-        sudo nano /etc/systemd/system/bookapp.service
+                sudo nano /etc/systemd/system/bookapp.service
 
     - Este archivo debe tener el siguiente código
 
-        [Unit]
-        Description=My Flask Application
+                [Unit]
+                Description=My Flask Application
 
-        [Service]
-        User=ec2-user
-        WorkingDirectory=/home/ec2-user/ec2-rds-ssm-python
-        ExecStart=/usr/bin/python3 /home/ec2-user/ec2-rds-ssm-python/app.py
-        Restart=always
+                [Service]
+                User=ec2-user
+                WorkingDirectory=/home/ec2-user/ec2-rds-ssm-python
+                ExecStart=/usr/bin/python3 /home/ec2-user/ec2-rds-ssm-python/app.py
+                Restart=always
 
-        [Install]
-        WantedBy=multi-user.target
-        Necesita volver a cargar el demonio
+                [Install]
+                WantedBy=multi-user.target
+                
 
     - Necesitas recargar el daemon (demonio)
-        sudo systemctl daemon-reload
+
+                sudo systemctl daemon-reload
 
     - Necesita iniciar el servicio
 
-        sudo systemctl start bookapp
+                sudo systemctl start bookapp
 
     - Debes habilitar el servicio cuando se inicia la instancia.
 
-        sudo systemctl enable bookapp
+                sudo systemctl enable bookapp
 
 5. Voy a AWS RDS para configurar el servicio de base de datos relacional.
 
@@ -195,17 +196,23 @@ Como se necesita que la VPC tenga una conexión a Internet, se debe configurar u
 
 6. En este paso, migraré la base de datos de AWS EC2 a AWS RDS.
 
-       - Desde la terminal de la instancia de AWS EC2, ejecuto los siguientes comandos:
-       - Verifico la conexión a AWS RDS desde AWS EC2 (debe cambiar rdsEndpoint por el endpoint suministrado por el servicio RDS)
+    - Desde la terminal de la instancia de AWS EC2, ejecuto los siguientes comandos:
 
-                mysql -u root -p --host rdsEndpoint
-       - Si la conexión es exitosa, puede ejecutar el siguiente comando SQL para ver las bases datos en RDS
-                show databases;
+    - Verifico la conexión a AWS RDS desde AWS EC2 (debe cambiar rdsEndpoint por el endpoint suministrado por el servicio RDS)
+                    
+                        mysql -u root -p --host rdsEndpoint
+                    
+
+    - Si la conexión es exitosa, puede ejecutar el siguiente comando SQL para ver las bases datos en RDS.
+
+                        show databases;
 
 - Comienzo con la migración con los siguientes comandos:
 
                 mysqldump --databases books_db -u root -p > bookDB.sql
+
 - Al generar el archivo bookDB.sql, se migra a RDS con el siguiente comando:
+
                 mysql -u root -p --host *rds-endpoint* < bookDB.sql
 
 - Puedes verificar si la migración fue exitosa
@@ -216,3 +223,38 @@ Como se necesita que la VPC tenga una conexión a Internet, se debe configurar u
                 SELECT * FROM Books;
 
 <hr>
+
+7. En este paso se va a configurar el servicio Auto Scaling Group y el Application Load Balancer.
+
+- Ir al servicio EC2 en AWS.
+    - Seleccionar la instancia (Bastion Host) lanzada en la Subred pública y crear una AMI.
+    - Crear un Launch Template con la AMI creada anteriormente. Para la configuración de Launch Template:
+        - No elegir VPC.
+        - Asignar Rol IAM.
+        - Crear par de claves: PEM
+    - Ir a la configuración de Auto Scaling Group.
+        - Elegir la Launch Template configurada anteriormente.
+        - No elegir Load Balancer.
+        - Seleccionar las subredes privadas en las que se lanzarán las instancias administradas por el grupo de Auto Scaling.
+        - Configurar la Política de Escalamiento.
+    - Ir a Load Balancers
+        - Elegir Application Load Balancer
+        - Elegir la VPC creada anteriormente y las dos Subredes Públicas.
+        - Crear un Target Group.
+        - Elegir las instancias como destino.
+            - Configurar el puerto en 5000 (servidor web)
+        - Definir la ruta de comprobación de estado como: /health
+    - En la configuración del Auto Scaling Group, asociar el balanceador de carga.
+
+8. Por último, puede probar si la aplicación responde desde el balanceador de carga de aplicaciones.
+
+    - Si la aplicación no responde desde el balanceador de carga de aplicaciones, verifique lo siguiente:
+        - Reinicie el servicio usando el servicio System Manager
+        - En System Manager, elija Fleet Manager.
+        - Seleccione los ID de las instancias que se ejecutan en la subred privada.
+        - Busque AWS-RunShellScript
+        - Escriba los siguientes comandos:
+
+                    sudo systemctl restart bookapp.
+
+        - Verifique las reglas de los grupos de seguridad.
