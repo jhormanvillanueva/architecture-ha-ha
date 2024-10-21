@@ -211,9 +211,9 @@ Como se necesita que la VPC tenga una conexión a Internet, se debe configurar u
 
                 mysqldump --databases books_db -u root -p > bookDB.sql
 
-- Al generar el archivo bookDB.sql, se migra a RDS con el siguiente comando:
+- Al generar el archivo bookDB.sql, se migra a RDS con el siguiente comando (debe cambiar rdsEndpoint por el Endpoint generado por RDS):
 
-                mysql -u root -p --host *rds-endpoint* < bookDB.sql
+                mysql -u root -p --host rdsEndpoint < bookDB.sql
 
 - Puedes verificar si la migración fue exitosa
 
