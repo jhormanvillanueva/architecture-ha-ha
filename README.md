@@ -4,8 +4,8 @@ En esta guía, configuraré una Virtual Private Cloud (VPC) para implementar un 
 
 ![Flask](https://img.shields.io/badge/flask-%23000.svg?style=for-the-badge&logo=flask&logoColor=white) ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54) ![AWS](https://img.shields.io/badge/Amazon_AWS-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)
 
-## Se va a implementar la arquitectura de nube en AWS de la siguiente imagen. 
-![arquitectura aws](img/arq-hs-ha.gif)
+## Se va a implementar la arquitectura que se observa en la siguiente imágen en AWS. 
+![arquitectura aws](img/architectureHA-HS.png)
 
 <hr>
 1. Se configura la infraestructura de red utilizando el servicio AWS VPC.
