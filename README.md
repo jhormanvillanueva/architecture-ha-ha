@@ -156,8 +156,8 @@ Como se necesita que la VPC tenga una conexión a Internet, se debe configurar u
 
                 [Service]
                 User=ec2-user
-                WorkingDirectory=/home/ec2-user/ec2-rds-ssm-python
-                ExecStart=/usr/bin/python3 /home/ec2-user/ec2-rds-ssm-python/app.py
+                WorkingDirectory=/home/ec2-user/architecture-ha-ha
+                ExecStart=/usr/bin/python3 /home/ec2-user/architecture-ha-ha/app.py
                 Restart=always
 
                 [Install]
