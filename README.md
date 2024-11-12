@@ -151,17 +151,17 @@ Como se necesita que la VPC tenga una conexión a Internet, se debe configurar u
 
     - Este archivo debe tener el siguiente código
 
-                [Unit]
-                Description=My Flask Application
+            [Unit]
+            Description=My Flask Application
 
-                [Service]
-                User=ec2-user
-                WorkingDirectory=/home/ec2-user/architecture-ha-ha
-                ExecStart=/usr/bin/python3 /home/ec2-user/architecture-ha-ha/app.py
-                Restart=always
+            [Service]
+            User=ec2-user
+            WorkingDirectory=/home/ec2-user/architecture-ha-ha
+            ExecStart=/usr/bin/python3 /home/ec2-user/architecture-ha-ha/app.py
+            Restart=always
 
-                [Install]
-                WantedBy=multi-user.target
+            [Install]
+            WantedBy=multi-user.target
                 
 
     - Necesitas recargar el daemon (demonio)
