@@ -119,7 +119,7 @@ Como se necesita que la VPC tenga una conexión a Internet, se debe configurar u
         pip install mysql-connector-python
         pip install boto3
         git clone https://github.com/jhormanvillanueva/architecture-ha-ha.git
-        sudo mv architecture-ha-hs /home/ec2-user
+        sudo mv architecture-ha-ha /home/ec2-user
         ```
     - Una vez que se completa el lanzamiento de la instancia, me conecto a la terminal, pruebo que las librerías estén instaladas y que el repositorio se haya clonado en EC2.
 
